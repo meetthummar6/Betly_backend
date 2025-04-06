@@ -16,11 +16,16 @@ app.use(express.json());
 
 //route imports
 import userRoutes from "./src/routes/user.route.js";
+import matchRoutes from "./src/routes/match.route.js";
+import betRoutes from "./src/routes/bet.route.js";
 
 
 
 //Routes
 app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/matches", matchRoutes);
+app.use("/api/v1/bets", betRoutes);
+
 
 
 //Server start
