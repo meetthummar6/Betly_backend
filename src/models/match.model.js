@@ -30,9 +30,15 @@ const matchSchema = new mongoose.Schema({
             type: String,
             required: true
         },
+        team1Odds: {
+            type: Number
+        },
         team2:{
             type: String,
             required: true
+        },
+        team2Odds: {
+            type: Number
         }
     },
     matchWinner: {

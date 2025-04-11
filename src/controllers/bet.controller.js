@@ -8,6 +8,13 @@ import axios from "axios";
 
 export const createBet = asyncHandler(async (req, res) => {
 
+    const { matchId, bet_team, bet_odds, amount, userId } = req.body;
+
+    //validation
+    if ([matchId, bet_team, bet_odds, amount, userId].some((field) => field?.trim() === "")) {
+        throw new ApiError(400, "All fields are required");
+    }
+
     //get user
     const user = await User.findById(bet.userId);
 
@@ -21,7 +28,13 @@ export const createBet = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Insufficient balance");
     }
     //create bet
-    const bet = await Bet.create(req.body);
+    const bet = await Bet.create({
+        userId,
+        matchId,
+        amount,
+        bet_team,
+        bet_odds
+    });
 
     //update user balance  
     user.balance -= bet.amount;
@@ -38,11 +51,17 @@ export const getBets = asyncHandler(async (req, res) => {
 
 export const getBetsByUserId = asyncHandler(async (req, res) => {
     const bets = await Bet.find({ userId: req.params.id });
+    if(bets.length === 0) {
+        throw new ApiError(404, "No bets found");
+    }
     return res.status(200).json(new ApiResponse(200, bets, "Bets fetched successfully"));
 });
 
 export const getBetsByMatchId = asyncHandler(async (req, res) => {
     const bets = await Bet.find({ matchId: req.params.id });
+    if(bets.length === 0) {
+        throw new ApiError(404, "No bets found");
+    }
     return res.status(200).json(new ApiResponse(200, bets, "Bets fetched successfully"));
 });
 
@@ -75,7 +94,7 @@ export const settleBets = asyncHandler(async (req, res) => {
 
         //find match winner and update status in database
         const winner = matchData.matchWinner;
-        await Match.findOneAndUpdate({ matchId: match._id }, { status: matchData.status }, { new: true });
+        await Match.findOneAndUpdate({ matchId: match._id }, {$set:{ status: matchData.status, matchWinner: matchData.matchWinner }}, { new: true });
 
         //find bets
         const bets = await Bet.find({ matchId: match._id });
@@ -85,8 +104,11 @@ export const settleBets = asyncHandler(async (req, res) => {
                 const user = await User.findById(bet.userId);
                 user.balance += bet.amount * bet.bet_odds;
                 await user.save();
+                await Bet.findOneAndUpdate({ _id: bet._id }, { $set:{ status: "Won" }}, { new: true });
             }
-            await Bet.findOneAndUpdate({ _id: bet._id }, { status: "Settled" }, { new: true });
+            else{
+                await Bet.findOneAndUpdate({ _id: bet._id }, { $set:{ status: "Lost" }}, { new: true });
+            }
         }
     }
     return res.status(200).json(new ApiResponse(200, "Bets settled successfully"));
