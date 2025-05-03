@@ -32,11 +32,17 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 
     //check if user already exists
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ username: username.toLowerCase() });
+    const emailExists = await User.findOne({ email });
 
     //if user already exists
     if(userExists) {
         throw new ApiError(400, "User already exists");
+    }
+
+    //if email already exists
+    if(emailExists) {
+        throw new ApiError(400, "Email already exists");
     }
 
     //create user
@@ -51,6 +57,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     //check if user was created
     if (!createdUser) {
+        retun
         throw new ApiError(500, "Something went wrong while registering the user")
     }
 
@@ -231,6 +238,7 @@ const changePassword = asyncHandler(async (req, res) => {
 
 
 const getCurrentUser = asyncHandler(async(req, res) => {
+    console.log(req.user);
     return res
     .status(200)
     .json(new ApiResponse(

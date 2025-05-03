@@ -1,8 +1,8 @@
 import express from "express";
 import cors from "cors";
-import mongoose from "mongoose";
 import 'dotenv/config';
 import connectDB from "./config/db.js";
+import cookieParser from "cookie-parser";
 
 //App
 const app = express();
@@ -11,8 +11,9 @@ const app = express();
 connectDB();
 
 // Middlewares
-app.use(cors());
+app.use(cors({credentials:true,origin:'http://localhost:5173'}));
 app.use(express.json());
+app.use(cookieParser());
 
 //route imports
 import userRoutes from "./src/routes/user.route.js";
@@ -26,7 +27,14 @@ app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/matches", matchRoutes);
 app.use("/api/v1/bets", betRoutes);
 
-
+app.use((err, req, res, next) => {
+    const statusCode = err.statusCode || 500;
+    const message = err.message || "Something went wrong";
+    return res.status(statusCode).json({
+        success: false,
+        message
+    });
+})
 
 //Server start
 app.listen(5000, () => {
