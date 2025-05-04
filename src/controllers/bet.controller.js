@@ -11,12 +11,20 @@ export const createBet = asyncHandler(async (req, res) => {
     const { matchId, bet_team, bet_odds, amount, userId } = req.body;
 
     //validation
-    if ([matchId, bet_team, bet_odds, amount, userId].some((field) => field?.trim() === "")) {
+    if(bet_odds <= 0) {
+        throw new ApiError(400, "Odds must be greater than 0");
+    }
+
+    if(amount <= 0) {
+        throw new ApiError(400, "Amount must be greater than 0");
+    }
+
+    if ([matchId, bet_team, userId].some((field) => field?.trim() === "")) {
         throw new ApiError(400, "All fields are required");
     }
 
     //get user
-    const user = await User.findById(bet.userId);
+    const user = await User.findById(userId);
 
     //check if user exists
     if (!user) {
@@ -24,9 +32,10 @@ export const createBet = asyncHandler(async (req, res) => {
     }
 
     //validation
-    if (user.balance < req.body.amount) {
+    if (user.balance < amount) {
         throw new ApiError(400, "Insufficient balance");
     }
+
     //create bet
     const bet = await Bet.create({
         userId,
@@ -36,8 +45,13 @@ export const createBet = asyncHandler(async (req, res) => {
         bet_odds
     });
 
+    //check if bet was created
+    if(!bet) {
+        throw new ApiError(500, "Something went wrong while creating bet");
+    }
+
     //update user balance  
-    user.balance -= bet.amount;
+    user.balance -= amount;
     await user.save();
 
 
