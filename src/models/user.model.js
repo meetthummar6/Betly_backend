@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema({
    },
    balance: {
     type: Number,
-    default: 1500
+    default: 5000
   },
   refreshToken: {
     type: String

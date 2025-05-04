@@ -64,7 +64,7 @@ export const getBets = asyncHandler(async (req, res) => {
 });
 
 export const getBetsByUserId = asyncHandler(async (req, res) => {
-    const bets = await Bet.find({ userId: req.params.id });
+    const bets = await Bet.find({ userId: req.params.id }).populate('matchId','name');
     if(bets.length === 0) {
         throw new ApiError(404, "No bets found");
     }

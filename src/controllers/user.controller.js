@@ -247,6 +247,28 @@ const getCurrentUser = asyncHandler(async(req, res) => {
     ))
 })
 
+const reqMoney = asyncHandler(async(req, res) => {
+    if(req.user.balance > 100){
+        throw new ApiError(400, "Insufficient balance");
+    }
+    const user = await User.findOneAndUpdate(
+        req.user._id,
+        {
+            $inc: { balance: 5000 }
+        },
+        {
+            new: true //return updated document
+        }
+    );
+    return res
+    .status(200)
+    .json(new ApiResponse(
+        200,
+        user,
+        "Money requested successfully"
+    ))
+})
+
 
 export {
     registerUser,
@@ -254,5 +276,6 @@ export {
     logoutUser,
     refreshAccessToken,
     changePassword,
-    getCurrentUser
+    getCurrentUser,
+    reqMoney
 }
