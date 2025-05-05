@@ -31,6 +31,25 @@ export const createBet = asyncHandler(async (req, res) => {
         throw new ApiError(400, "User does not exist");
     }
 
+    //check if match exists
+    const match = await Match.findById(matchId);
+    if (!match) {
+        throw new ApiError(400, "Match does not exist");
+    }
+
+    //validate bet team
+    if(bet_team !== match.teams.team1 && bet_team !== match.teams.team2) {
+        throw new ApiError(400, "Invalid bet team");
+    }
+
+    //validate bet odds
+    if(bet_team===match.teams.team1 && bet_odds !== match.teams.team1Odds) {
+        throw new ApiError(400, "Invalid bet odds");
+    }
+    else if(bet_team===match.teams.team2 && bet_odds !== match.teams.team2Odds) {
+        throw new ApiError(400, "Invalid bet odds");
+    }
+
     //validation
     if (user.balance < amount) {
         throw new ApiError(400, "Insufficient balance");
@@ -64,7 +83,7 @@ export const getBets = asyncHandler(async (req, res) => {
 });
 
 export const getBetsByUserId = asyncHandler(async (req, res) => {
-    const bets = await Bet.find({ userId: req.params.id }).populate('matchId','name');
+    const bets = await Bet.find({ userId: req.params.id }).populate('matchId','name').sort({ createdAt: -1 });
     if(bets.length === 0) {
         throw new ApiError(404, "No bets found");
     }

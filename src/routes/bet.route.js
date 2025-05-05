@@ -8,7 +8,7 @@ const router = Router();
 router.post("/", verifyJWT,createBet);
 router.get("/user/:id",verifyJWT,getBetsByUserId);
 router.get("/match/:id", verifyJWT,getBetsByMatchId);
-router.get("/settle", settleBets);
+router.post("/settle", settleBets);
 router.get("/:id", verifyJWT,getBetById);
 router.get("/",verifyJWT,getBets);
 

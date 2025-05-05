@@ -103,7 +103,7 @@ export const getOdds = asyncHandler(async (req, res) => {
 
             const { team1Odds, team2Odds } = await calculateOdds(team1Points, team2Points, team1WinsLast5, team2WinsLast5);
 
-            await Match.findOneAndUpdate({ _id: match._id }, { $set: { 'teams.team1Odds':team1Odds, 'teams.team2Odds':team2Odds } }, { new: true });
+            await Match.findOneAndUpdate({ _id: match._id }, { $set: { 'teams.team1Odds':team1Odds.toFixed(2), 'teams.team2Odds':team2Odds.toFixed(2) } }, { new: true });
         }
         return res.status(200).json(new ApiResponse(200, matches, "Odds fetched successfully"));
     }

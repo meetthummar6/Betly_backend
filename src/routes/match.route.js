@@ -8,6 +8,6 @@ const router = Router();
 router.get("/match/:id", verifyJWT,getMatchById);
 router.get("/upcoming-matches",verifyJWT,getUpcomingMatches);
 router.get("/matches-by-date/:date", verifyJWT,getMatchesByDate);
-router.get("/odds", getOdds);
+router.post("/odds", getOdds);
 
 export default router;
