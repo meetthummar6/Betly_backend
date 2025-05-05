@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import 'dotenv/config';
-import connectDB from "./config/db.js";
+import connectDB from "../config/db.js";
 import cookieParser from "cookie-parser";
 
 //App
@@ -16,9 +16,9 @@ app.use(express.json());
 app.use(cookieParser());
 
 //route imports
-import userRoutes from "./src/routes/user.route.js";
-import matchRoutes from "./src/routes/match.route.js";
-import betRoutes from "./src/routes/bet.route.js";
+import userRoutes from "../src/routes/user.route.js";
+import matchRoutes from "../src/routes/match.route.js";
+import betRoutes from "../src/routes/bet.route.js";
 
 
 
