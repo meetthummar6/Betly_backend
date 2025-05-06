@@ -249,7 +249,7 @@ const reqMoney = asyncHandler(async(req, res) => {
         throw new ApiError(400, "Insufficient balance");
     }
     //check if user has any past bets
-    const pastBets=Bet.find({userId: req.user._id,status:"pending"});
+    const pastBets=Bet.find({userId: req.user._id,status:"Pending"});
 
     if(pastBets.length > 0){
         throw new ApiError(400, "You can request money after bets are over");
