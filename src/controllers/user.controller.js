@@ -3,6 +3,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
+import { Bet } from "../models/bet.model.js";
 
 const generateAccessAndRefereshTokens = async(userId) =>{
     try {
@@ -247,6 +248,13 @@ const reqMoney = asyncHandler(async(req, res) => {
     if(req.user.balance > 100){
         throw new ApiError(400, "Insufficient balance");
     }
+    //check if user has any past bets
+    const pastBets=Bet.find({userId: req.user._id,status:"pending"});
+
+    if(pastBets.length > 0){
+        throw new ApiError(400, "You can request money after bets are over");
+    }
+
     const user = await User.findOneAndUpdate(
         req.user._id,
         {
