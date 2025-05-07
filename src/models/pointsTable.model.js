@@ -5,7 +5,7 @@ const teamStandingSchema = new mongoose.Schema({
 },{ strict: false });
 
 const pointsTableSchema = new mongoose.Schema({
-    table:{
+    data:{
         type:Map,
         of:teamStandingSchema
     }
