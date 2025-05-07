@@ -57,7 +57,9 @@ export const getOdds = asyncHandler(async (req, res) => {
         if(!pointsTableData){
             throw new ApiError(404, "Points table not found");
         }
-        const pointsTable = pointsTableData.data;
+        const pointsTable = pointsTableData.table;
+        console.log(pointsTable);
+        console.log(pointsTableData);
         const matches = await Match.find().where('time').gt(new Date().toISOString()).sort({ time: 1 }).limit(4);
         for (const match of matches) {
             const team1 = match.teams.team1;
