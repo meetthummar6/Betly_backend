@@ -1,13 +1,9 @@
 import mongoose from "mongoose";
 
-const teamStandingSchema = new mongoose.Schema({
-    
-},{ strict: false });
-
 const pointsTableSchema = new mongoose.Schema({
-    data:{
-        type:Map,
-        of:teamStandingSchema
+    data: {
+        type: Object,
+        required: true
     }
 },{ timestamps: true });
 
