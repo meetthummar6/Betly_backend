@@ -53,15 +53,18 @@ export const getMatchesByDate = asyncHandler(async (req, res) => {
 //get odds for upcoming 4 matches from API
 export const getOdds = asyncHandler(async (req, res) => {
     try{
-        const pointsTableData = await PointsTable.findOne().sort({ updatedAt: -1 });
-        if(!pointsTableData){
+        const pointsTable = await PointsTable.findOne().sort({ updatedAt: -1 });
+        if(!pointsTable){
             throw new ApiError(404, "Points table not found");
-        }
-        const pointsTable = pointsTableData.table;
-        console.log(pointsTable);
-        console.log(pointsTableData);
+        };
         const matches = await Match.find().where('time').gt(new Date().toISOString()).sort({ time: 1 }).limit(4);
         for (const match of matches) {
+            if(!pointsTable[match.teams.team1]){
+                console.error(`Team ${match.teams.team1} not found in points table`);
+            }
+            if(!pointsTable[match.teams.team2]){
+                console.error(`Team ${match.teams.team2} not found in points table`);
+            }
             const team1 = match.teams.team1;
             const team2 = match.teams.team2;
             const team1Points = pointsTable[team1]?.position || 0;
