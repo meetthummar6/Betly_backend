@@ -1,4 +1,5 @@
 import { Match } from "../models/match.model.js";
+import { PointsTable } from "../models/pointsTable.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -51,47 +52,11 @@ export const getMatchesByDate = asyncHandler(async (req, res) => {
 
 //get odds for upcoming 4 matches from API
 export const getOdds = asyncHandler(async (req, res) => {
-    const headers={
-        'User-Agent': 'Mozilla/5.0',
-        'Accept-Language': 'en-US,en;q=0.8'
-    };
-
-    const getPointsTable = async () => {
-        const url="https://www.espncricinfo.com/series/ipl-2025-1449924/points-table-standings";
-        const response = await axios.get(url, { headers });
-        const $ = load(response.data);
-        const pointsTable = {};
-        const IPLTable =$('table.ds-w-full').first();
-        IPLTable.find('tbody tr').each((index, row) => {
-            const cols = $(row).find('td');
-            if(cols.length >= 9){
-                let team;
-                let form='';
-                if(index==18){
-                    team = $(cols[0]).text().trim().substring(2);
-                }
-                else{
-                    team = $(cols[0]).text().trim().substring(1);
-                }
-                const pos=(index/2)+1;
-    
-                //complex form data
-                const dt=$(cols[8]).find('span');
-                for(let i=0;i<dt.length;i++){
-                    form+=dt.eq(i).text().trim();
-                    if(i<dt.length-1){
-                        form+=' ';
-                    }
-                }
-                const lasts=form.split(' ').filter(r => ['W'].includes(r));
-                pointsTable[team] = { position: pos, wins_last5: lasts.length };
-            }
-        })
-        return pointsTable;
-    };     
-
     try{
-        const pointsTable = await getPointsTable();
+        const pointsTable = await PointsTable.findOne().sort({ updatedAt: -1 });
+        if(!pointsTable){
+            throw new ApiError(404, "Points table not found");
+        }
         const matches = await Match.find().where('time').gt(new Date().toISOString()).sort({ time: 1 }).limit(4);
         for (const match of matches) {
             const team1 = match.teams.team1;
