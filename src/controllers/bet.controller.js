@@ -108,15 +108,9 @@ export const getBetById = asyncHandler(async (req, res) => {
 
 
 export const settleBets = asyncHandler(async (req, res) => {
-    //get results of previous day matches
-    const yesterday = () => {
-        let d = new Date();
-        d.setDate(d.getDate() - 1);
-        return d;
-      };
-      
-    const yesterdaydate = yesterday().toISOString().split('T')[0];
-    const matches = await Match.find().where('date').eq(yesterdaydate).sort({ date: 1 });
+    //get results of previous day matches  
+    const todaydate = new Date().toISOString().split('T')[0];
+    const matches = await Match.find().where('date').eq(todaydate).sort({ date: 1 });
     if (matches.length === 0) {
         throw new ApiError(404, "No matches found");
     }
